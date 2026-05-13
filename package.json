@@ -1,0 +1,74 @@
+{
+  "name": "atithi-pms-desktop",
+  "version": "1.0.0",
+  "description": "Offline-first guest house and hotel management desktop PMS for Indian properties.",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run renderer\" \"wait-on http://localhost:5173 http://localhost:4100/health && electron .\"",
+    "renderer": "vite --host 127.0.0.1",
+    "server": "node server/index.cjs",
+    "build": "vite build",
+    "electron": "electron .",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "db:init": "node server/init-db.cjs",
+    "prisma:seed": "node prisma/seed.cjs",
+    "setup": "npm install && npm run prisma:generate && npm run db:init && npm run prisma:seed",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "in.atithi.pms",
+    "productName": "Atithi PMS",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "prisma/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@radix-ui/react-dialog": "^1.1.4",
+    "@radix-ui/react-dropdown-menu": "^2.1.4",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-select": "^2.1.4",
+    "@radix-ui/react-slot": "^1.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "electron-is-dev": "^3.0.1",
+    "express": "^4.21.2",
+    "framer-motion": "^11.15.0",
+    "lucide-react": "^0.468.0",
+    "recharts": "^2.15.0",
+    "tailwind-merge": "^2.6.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "postcss": "^8.4.49",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.3",
+    "wait-on": "^8.0.1"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.cjs"
+  }
+}
