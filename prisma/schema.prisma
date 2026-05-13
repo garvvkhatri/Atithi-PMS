@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Room {
+  id          Int          @id @default(autoincrement())
+  number      String       @unique
+  floor       Int
+  type        String
+  capacity    Int
+  price       Int
+  status      String       @default("AVAILABLE")
+  notes       String?
+  bookings    Booking[]
+  groupRooms  GroupRoom[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Guest {
+  id            Int       @id @default(autoincrement())
+  fullName      String
+  phone         String
+  address       String?
+  idProof       String?
+  idNumber      String?
+  vehicleNumber String?
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Booking {
+  id             Int            @id @default(autoincrement())
+  bookingCode    String         @unique
+  guestId        Int
+  roomId         Int
+  groupBookingId Int?
+  checkIn        DateTime
+  checkOut       DateTime
+  nights         Int
+  numberOfGuests Int
+  roomPrice      Int
+  totalAmount    Int
+  advancePayment Int            @default(0)
+  pendingAmount  Int
+  status         String         @default("RESERVED")
+  paymentStatus  String         @default("PENDING")
+  source         String?
+  notes          String?
+  guest          Guest          @relation(fields: [guestId], references: [id])
+  room           Room           @relation(fields: [roomId], references: [id])
+  groupBooking   GroupBooking?  @relation(fields: [groupBookingId], references: [id])
+  payments       Payment[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model GroupBooking {
+  id              Int          @id @default(autoincrement())
+  eventName       String
+  eventType       String
+  groupLeader     String
+  phone           String
+  totalGuests     Int
+  cateringNotes   String?
+  decorationNotes String?
+  checkIn         DateTime
+  checkOut        DateTime
+  status          String       @default("RESERVED")
+  rooms           GroupRoom[]
+  bookings        Booking[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model GroupRoom {
+  id             Int          @id @default(autoincrement())
+  groupBookingId Int
+  roomId         Int
+  groupBooking   GroupBooking @relation(fields: [groupBookingId], references: [id])
+  room           Room         @relation(fields: [roomId], references: [id])
+
+  @@unique([groupBookingId, roomId])
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  bookingId Int
+  amount    Int
+  method    String
+  note      String?
+  paidAt    DateTime @default(now())
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  category    String
+  description String
+  amount      Int
+  spentAt     DateTime
+  createdAt   DateTime @default(now())
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  role      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
